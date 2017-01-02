@@ -84,7 +84,6 @@ public class LoginActivity extends AppCompatActivity {
 
             if (!fingerprintManager.hasEnrolledFingerprints()) {
 
-                // This happens when no fingerprints are registered.
                 Toast.makeText(this, "Register at least one fingerprint in Settings", Toast.LENGTH_LONG).show();
                 return;
             }
