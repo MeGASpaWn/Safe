@@ -55,6 +55,14 @@ public class CategoryActivity extends AppCompatActivity {
             }
         });
 
+        listItemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(CategoryActivity.this, "Long clicked.", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+
     }
 
     private void openAddCategoryDialog(){
