@@ -25,40 +25,32 @@ public class CategoryActivity extends AppCompatActivity {
 
     ListView listItemView;
     FloatingActionButton fab;
+    List<String> categoryList;
 
     Realm realm;
-
-    String key = "F44DC8346B3796D51E497999E0E3F47E01A7807A50F1FAF75BF1A2009817DB14F1A17692C19803DB609ADE0AD1833B1F5AE1B66634C924B045492F5A7E479A3D";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
-        Log.d("VARUN", "Realm ONCREATE");
-
+        listItemView = (ListView)findViewById(R.id.category_listview);
+        fab = (FloatingActionButton)findViewById(R.id.add_category_btn);
         realm = Realm.getDefaultInstance();
 
-        List<String> categoryList = new ArrayList<String>();
-
+        categoryList = new ArrayList<String>();
         RealmResults<Category> results = realm.where(Category.class).findAll();
-
         for(Category category:results) {
             categoryList.add(category.getId() + " - " + category.getName());
         }
-
         String[] listArr = categoryList.toArray(new String[categoryList.size()]);
 
-        listItemView = (ListView)findViewById(R.id.category_listview);
-        fab = (FloatingActionButton)findViewById(R.id.add_category_btn);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_2, android.R.id.text1, listArr);
-
         listItemView.setAdapter(adapter);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 openAddCategoryDialog();
             }
         });
@@ -84,11 +76,12 @@ public class CategoryActivity extends AppCompatActivity {
 
                 int count = (int) realm.where(Category.class).count();
 
-                Category category = realm.createObject(Category.class);;
+                Category category = realm.createObject(Category.class);
                 category.setId(count + 1);
                 category.setName(subEditText.getText().toString());
 
                 realm.commitTransaction();
+
                 Toast.makeText(CategoryActivity.this, "Category [" + subEditText.getText().toString() + "] added.", Toast.LENGTH_SHORT).show();
             }
         });
