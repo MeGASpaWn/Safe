@@ -13,7 +13,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.megaspawn.utilities.safe.model.Category;
+import com.megaspawn.utilities.safe.model.*;
+import com.megaspawn.utilities.safe.util.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class CategoryActivity extends AppCompatActivity {
     ListView listItemView;
     FloatingActionButton fab;
     List<String> categoryList;
+    int parentId = 0; // Initialize parentId to 0 (top level parents)
 
     Realm realm;
 
@@ -34,18 +36,14 @@ public class CategoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
+        // Get all views
         listItemView = (ListView)findViewById(R.id.category_listview);
         fab = (FloatingActionButton)findViewById(R.id.add_category_btn);
         realm = Realm.getDefaultInstance();
 
-        categoryList = new ArrayList<String>();
-        RealmResults<Category> results = realm.where(Category.class).findAll();
-        for(Category category:results) {
-            categoryList.add(category.getId() + " - " + category.getName());
-        }
-        String[] listArr = categoryList.toArray(new String[categoryList.size()]);
+        RealmResults<SafeCategory> results = realm.where(SafeCategory.class).equalTo("parentId", parentId).findAll();
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_2, android.R.id.text1, listArr);
+        CustomArrayAdapter adapter = new CustomArrayAdapter(this, results);
         listItemView.setAdapter(adapter);
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -82,9 +80,9 @@ public class CategoryActivity extends AppCompatActivity {
 
                 realm.beginTransaction();
 
-                int count = (int) realm.where(Category.class).count();
+                int count = (int) realm.where(SafeCategory.class).count();
 
-                Category category = realm.createObject(Category.class);
+                SafeCategory category = realm.createObject(SafeCategory.class);
                 category.setId(count + 1);
                 category.setName(subEditText.getText().toString());
 

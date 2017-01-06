@@ -6,11 +6,13 @@ import io.realm.RealmObject;
  * Created by varun on 1/1/17.
  */
 
-public class Category extends RealmObject {
+public class SafeCategory extends RealmObject {
 
     int id;
 
     String name;
+
+    int parentId;
 
     public int getId() {
         return id;
@@ -28,5 +30,11 @@ public class Category extends RealmObject {
         this.name = name;
     }
 
+    public int getParentId() {
+        return parentId;
+    }
 
+    public void setParentId(int parentId) {
+        this.parentId = parentId;
+    }
 }
