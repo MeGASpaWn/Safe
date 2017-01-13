@@ -57,7 +57,7 @@ public class FingerprintHandler extends
     @Override
     public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
 
-        Toast.makeText(appContext, "Authentication succeeded.", Toast.LENGTH_LONG).show();
+        //Toast.makeText(appContext, "Authentication succeeded.", Toast.LENGTH_LONG).show();
         Intent loginIntent = new Intent(appContext, CategoryActivity.class);
         appContext.startActivity(loginIntent);
     }

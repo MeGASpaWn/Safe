@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -26,8 +27,11 @@ public class CategoryActivity extends AppCompatActivity {
 
     ListView listItemView;
     FloatingActionButton fab;
-    List<String> categoryList;
+    List<SafeCategory> categoryList = new ArrayList<>();
     int parentId = 0; // Initialize parentId to 0 (top level parents)
+
+    //RealmResults<SafeCategory> results;
+    CustomArrayAdapter adapter;
 
     Realm realm;
 
@@ -41,9 +45,9 @@ public class CategoryActivity extends AppCompatActivity {
         fab = (FloatingActionButton)findViewById(R.id.add_category_btn);
         realm = Realm.getDefaultInstance();
 
-        RealmResults<SafeCategory> results = realm.where(SafeCategory.class).equalTo("parentId", parentId).findAll();
+        categoryList.addAll(realm.where(SafeCategory.class).equalTo("parentId", parentId).findAll());
 
-        CustomArrayAdapter adapter = new CustomArrayAdapter(this, results);
+        adapter = new CustomArrayAdapter(this, categoryList);
         listItemView.setAdapter(adapter);
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -53,11 +57,18 @@ public class CategoryActivity extends AppCompatActivity {
             }
         });
 
-        listItemView.setOnLongClickListener(new View.OnLongClickListener() {
+        listItemView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                Toast.makeText(CategoryActivity.this, "Long clicked.", Toast.LENGTH_SHORT).show();
-                return false;
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(CategoryActivity.this, "Short clicked.", Toast.LENGTH_SHORT).show();
+                SafeCategory category = (SafeCategory) parent.getAdapter().getItem(position);
+                parentId = category.getId();
+                categoryList.clear();
+                categoryList.addAll(realm.where(SafeCategory.class).equalTo("parentId", parentId).findAll());
+                for(SafeCategory safeCategory:categoryList) {
+                    Log.d("VARUN", "Parent: " + parentId + " Category: " + safeCategory.getName());
+                }
+                adapter.notifyDataSetChanged();
             }
         });
 
@@ -85,17 +96,23 @@ public class CategoryActivity extends AppCompatActivity {
                 SafeCategory category = realm.createObject(SafeCategory.class);
                 category.setId(count + 1);
                 category.setName(subEditText.getText().toString());
+                category.setParentId(parentId);
 
                 realm.commitTransaction();
 
-                Toast.makeText(CategoryActivity.this, "Category [" + subEditText.getText().toString() + "] added.", Toast.LENGTH_SHORT).show();
+                categoryList.clear();
+                categoryList.addAll(realm.where(SafeCategory.class).equalTo("parentId", parentId).findAll());
+                for(SafeCategory safeCategory:categoryList) {
+                    Log.d("VARUN", "Parent: " + parentId + " Category: " + safeCategory.getName());
+                }
+                adapter.notifyDataSetChanged();
             }
         });
 
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(CategoryActivity.this, "Canceled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(CategoryActivity.this, "Canceled " + parentId, Toast.LENGTH_SHORT).show();
             }
         });
 
